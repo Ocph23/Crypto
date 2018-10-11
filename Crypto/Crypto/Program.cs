@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Linq;
 
 namespace Crypto
 {
@@ -7,27 +8,58 @@ namespace Crypto
     {
         static void Main(string[] args)
         {
-            try
+            bool complete = false;
+            while (!complete)
             {
-                StringBuilder textBuilder = new StringBuilder();
-                foreach (var item in args)
+                var proccessType = ProccessType.Encrypt;
+                var sourceType = SourceType.Alphabeth;
+
+                Console.Write("Crypto Type (encrypt/decrypt) : "); var cryptoType = Console.ReadLine();
+
+                if (cryptoType.ToUpper() == "DECRYPT")
+                    proccessType = ProccessType.Decript;
+                else
+                    cryptoType = "ENCRYPT";
+
+
+                Console.Clear();
+                Console.WriteLine("Crypto Type : "+ cryptoType);
+                Console.Write("Input Your Text : "); var text = Console.ReadLine();
+                Console.WriteLine();
+               
+                if (!text.All(s=>char.IsLetter(s)))
+                    sourceType = SourceType.ASCII;
+
+                Console.WriteLine("Result");
+                Console.WriteLine("Source Type : " + sourceType.ToString().ToUpper());
+             
+                try
                 {
-                    textBuilder.Append(item);
-                    textBuilder.Append(" ");
+                    switch (proccessType)
+                    {
+                        case ProccessType.Encrypt:
+                            var encryptResult = Proccess(text, 3, sourceType, proccessType);
+                            Console.WriteLine("Encrypt Result: " + encryptResult);
+                            break;
+
+                        case ProccessType.Decript:
+                            var decriptResult = Proccess(text, 3, sourceType, ProccessType.Decript);
+                            Console.WriteLine("Decrypt Result: " + decriptResult);
+                            break;
+                    }
+                    Console.Write("Keluar ? (Y/N) : ");
+                    var isOut = Console.ReadLine();
+                    if (isOut.ToUpper()=="Y")
+                    {
+                        complete = true;
+                    }
+                    Console.Clear();
                 }
-
-                var encryptResult = Proccess(textBuilder.ToString(), 3, SourceType.ASCII, ProccessType.Encrypt);
-                Console.WriteLine("Encrypt Result: " + encryptResult);
-
-                var decriptResult = Proccess(encryptResult, 3, SourceType.ASCII, ProccessType.Decript);
-                Console.WriteLine("Decrypt Result: " + decriptResult);
-                Console.ReadLine();
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                throw new SystemException(ex.Message);
-            }
-
         }
 
         private static string Proccess(string text, int key, SourceType type, ProccessType proccessType)
@@ -37,7 +69,7 @@ namespace Crypto
             {
                 case SourceType.Alphabeth:
                     var plainText = text.ToUpper();
-                    var source = "abcdefghijklmnopqrstuvwxyz".ToUpper();
+                    var source = GetAlphabet().ToUpper();
                     foreach (var item in plainText)
                     {
                         int resultIncex = GetIndex(source.IndexOf(item), key, source.Length, proccessType);
@@ -57,6 +89,11 @@ namespace Crypto
 
             return sb.ToString();
 
+        }
+
+        private static string GetAlphabet()
+        {
+            return "abcdefghijklmnopqrstuvwxyz";
         }
 
         private static int GetIndex(int index, int key, int length, ProccessType proccessType)
