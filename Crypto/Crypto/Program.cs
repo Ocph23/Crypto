@@ -38,12 +38,12 @@ namespace Crypto
                     switch (proccessType)
                     {
                         case ProccessType.Encrypt:
-                            var encryptResult = Proccess(text, 3, sourceType, proccessType);
+                            var encryptResult = Proccess(text, 1000, sourceType, proccessType);
                             Console.WriteLine("Encrypt Result: " + encryptResult);
                             break;
 
                         case ProccessType.Decript:
-                            var decriptResult = Proccess(text, 3, sourceType, ProccessType.Decript);
+                            var decriptResult = Proccess(text, 1000, sourceType, ProccessType.Decript);
                             Console.WriteLine("Decrypt Result: " + decriptResult);
                             break;
                     }
@@ -99,9 +99,15 @@ namespace Crypto
         private static int GetIndex(int index, int key, int length, ProccessType proccessType)
         {
             if (proccessType == ProccessType.Encrypt)
-                return (index + key) % length;
+                return Program.mod((index + key), length);
             else
-                return (length + index - key) % length;
+                return Program.mod((index - key), length);
+        }
+
+
+        public static int mod(int n, int m)
+        {
+            return ((n % m) + m) % m;
         }
     }
 
